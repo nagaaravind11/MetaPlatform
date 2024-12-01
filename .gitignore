@@ -1,0 +1,25 @@
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+
+# Build output
+dist/
+build/
+*.log
+
+# Local development
+*.local
