@@ -2253,9 +2253,12 @@ Based on the analysis of existing solutions, MetaPlatform addresses the followin
 - "Microservices Patterns" by Chris Richardson (Manning, 2018)
 - "Microservices Security in Action" by Prabath Siriwardena and Nuwan Dias (Manning, 2020)
 
-
 ### Technical Documentation
 - [Apache Atlas Documentation](https://atlas.apache.org/documentation.html)
 - [OpenMetadata Documentation](https://docs.open-metadata.org/)
 - [DataHub Documentation](https://datahubproject.io/docs/)
 - [Amundsen Documentation](https://www.amundsen.io/amundsen/)
+
+### Tools and Resources
+- **Mermaid**: [Mermaid Documentation](https://mermaid-js.github.io/mermaid/#/) - Guide on creating diagrams with Mermaid.
+
