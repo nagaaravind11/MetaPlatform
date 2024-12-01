@@ -1,8 +1,5 @@
 # Metadata Platform Design Document
 
-
-
-
 ## Table of Contents
 
 1. [Introduction](#introduction)
@@ -30,18 +27,18 @@ The MetaPlatform is an enterprise-grade metadata management system designed to a
 ### Functional Requirements
 
 1. **Metadata Management**
-   - Asset registration and discovery
-   - Relationship mapping and lineage tracking
-   - Version control and history
-   - Custom metadata attributes
-   - Bulk operations support
+   - Asset registration and lifecycle management
+   - Schema validation and evolution
+   - Custom attributes and extensions
+   - Bulk operations with transactional support
+   - Version control with Git-like branching
 
 2. **Search & Discovery**
-   - Full-text search
-   - Faceted search
-   - Natural language queries
-   - Advanced filtering
-   - Semantic search capabilities
+   - Multi-modal search (text, vector, graph)
+   - Query federation across stores
+   - Real-time indexing pipeline
+   - Custom ranking algorithms
+   - Advanced query optimization
 
 3. **Integration Capabilities**
    - REST APIs
@@ -84,290 +81,277 @@ The MetaPlatform is an enterprise-grade metadata management system designed to a
 
 ## Architecture Overview
 
+The MetaPlatform architecture follows a modern, cloud-native microservices approach with emphasis on scalability, resilience, and extensibility.
+
 ```mermaid
 graph TB
-    subgraph "External Clients"
-        WEB["Web UI"]
-        SDK["Client SDKs"]
-        EXT["External Systems"]
+    subgraph "Client Layer"
+        UI[Web UI]
+        CLI[CLI Tool]
+        API[REST API]
+        style UI fill:#b3e0ff,stroke:#0066cc
+        style CLI fill:#b3e0ff,stroke:#0066cc
+        style API fill:#b3e0ff,stroke:#0066cc
     end
 
-    subgraph "Load Balancing & CDN"
-        CDN["Content Delivery Network"]
-        LB["Load Balancer"]
-    end
-
-    subgraph "API Gateway & Security"
-        AG["API Gateway"]
-        subgraph "Security Services"
-            AUTH["Authentication Service"]
-            AUTHZ["Authorization Service"]
-            AUDIT["Audit Logging"]
-        end
+    subgraph "API Gateway Layer"
+        Gateway[API Gateway]
+        Auth[Authentication & Authorization]
+        style Gateway fill:#ffcccc,stroke:#ff0000
+        style Auth fill:#ffcccc,stroke:#ff0000
     end
 
     subgraph "Core Services"
-        subgraph "Metadata Services"
-            MS["Metadata Management"]
-            VS["Validation Service"]
-            LS["Lineage Tracking"]
-        end
-        
-        subgraph "Search Services"
-            SS["Search Engine"]
-            IS["Indexing Service"]
-            AS["Analytics Engine"]
-        end
-        
-        subgraph "Integration Services"
-            CS["Connector Service"]
-            ES["Event Processing"]
-            NS["Notification Service"]
-        end
+        direction TB
+        MS[Metadata Service]
+        LS[Lineage Service]
+        IS[Indexing Service]
+        QS[Query Service]
+        AS[Analytics Service]
+        style MS fill:#d9f2d9,stroke:#006600
+        style LS fill:#d9f2d9,stroke:#006600
+        style IS fill:#d9f2d9,stroke:#006600
+        style QS fill:#d9f2d9,stroke:#006600
+        style AS fill:#d9f2d9,stroke:#006600
     end
 
-    subgraph "Processing Layer"
-        subgraph "Stream Processing"
-            KFK["Message Broker"]
-            KST["Stream Processing Framework"]
-        end
-        
-        subgraph "Batch Processing"
-            BATCH["Batch Processing Framework"]
-            AWF["Workflow Orchestration"]
-        end
+    subgraph "Data Processing Layer"
+        Stream[Stream Processing]
+        Batch[Batch Processing]
+        ETL[ETL Pipeline]
+        style Stream fill:#ffe6cc,stroke:#ff9900
+        style Batch fill:#ffe6cc,stroke:#ff9900
+        style ETL fill:#ffe6cc,stroke:#ff9900
     end
 
     subgraph "Storage Layer"
-        subgraph "Operational Storage"
-            PG["Relational Database"]
-            DYNAMO["NoSQL Database"]
-        end
-        
-        subgraph "Search & Analytics"
-            ES["Search Database"]
-            CH["Analytics Database"]
-        end
-        
-        subgraph "Data Lake & Cache"
-            RD["In-memory Cache"]
-            S3["Data Lake Storage"]
-        end
+        RDB[(Relational DB)]
+        Graph[(Graph DB)]
+        Vector[(Vector DB)]
+        TS[(Time Series DB)]
+        Cache[(Cache)]
+        style RDB fill:#e6ccff,stroke:#6600cc
+        style Graph fill:#e6ccff,stroke:#6600cc
+        style Vector fill:#e6ccff,stroke:#6600cc
+        style TS fill:#e6ccff,stroke:#6600cc
+        style Cache fill:#e6ccff,stroke:#6600cc
     end
 
-    %% Client Connections
-    WEB --> CDN
-    SDK --> LB
-    EXT --> LB
-    CDN --> LB
-    
-    %% Gateway & Security
-    LB --> AG
-    AG --> AUTH
-    AG --> AUTHZ
-    AG --> AUDIT
-    
-    %% Core Services Connections
-    AG --> MS
-    AG --> SS
-    AG --> CS
-    
-    %% Service Interactions
-    MS --> VS
-    MS --> LS
-    SS --> IS
-    SS --> AS
-    CS --> ES
-    CS --> NS
-    
-    %% Processing Layer
-    MS --> KFK
-    SS --> KFK
-    CS --> KFK
-    KFK --> KST
-    KST --> BATCH
-    BATCH --> AWF
-    
-    %% Storage Layer
-    MS --> PG
-    MS --> DYNAMO
-    SS --> ES
-    AS --> CH
-    MS --> RD
-    SS --> RD
-    BATCH --> S3
+    subgraph "Infrastructure Services"
+        Service-Discovery[Service Discovery]
+        Config[Config Management]
+        Monitoring[Monitoring]
+        Logging[Logging]
+        style Service-Discovery fill:#ffd9cc,stroke:#cc3300
+        style Config fill:#ffd9cc,stroke:#cc3300
+        style Monitoring fill:#ffd9cc,stroke:#cc3300
+        style Logging fill:#ffd9cc,stroke:#cc3300
+    end
 
-    classDef external fill:#f9f,stroke:#333,stroke-width:2px
-    classDef gateway fill:#ff9,stroke:#333,stroke-width:2px
-    classDef core fill:#9f9,stroke:#333,stroke-width:2px
-    classDef processing fill:#99f,stroke:#333,stroke-width:2px
-    classDef storage fill:#f99,stroke:#333,stroke-width:2px
+    %% Connections
+    UI --> Gateway
+    CLI --> Gateway
+    API --> Gateway
+    Gateway --> Auth
+    Auth --> MS & LS & IS & QS & AS
     
-    class WEB,SDK,EXT external
-    class AG,AUTH,AUTHZ,AUDIT gateway
-    class MS,VS,LS,SS,IS,AS,CS,ES,NS core
-    class KFK,KST,BATCH,AWF processing
-    class PG,DYNAMO,ES,CH,RD,S3 storage
+    MS --> Stream & Batch
+    LS --> Stream & Batch
+    IS --> Stream
+    QS --> Cache
+    AS --> Batch
+    
+    Stream --> RDB & Graph & Vector & TS
+    Batch --> RDB & Graph & Vector & TS
+    ETL --> RDB & Graph & Vector & TS
+    
+    MS & LS & IS & QS & AS --> Service-Discovery
+    MS & LS & IS & QS & AS --> Config
+    MS & LS & IS & QS & AS --> Monitoring
+    MS & LS & IS & QS & AS --> Logging
+
+    classDef default fill:#fff,stroke:#333,stroke-width:2px;
 ```
 
-### Data Flow
+### Key Components
 
-1. **Ingestion Flow**
-   ```mermaid
-   sequenceDiagram
-       participant Source
-       participant Connector
-       participant Kafka
-       participant Flink
-       participant Storage
-       
-       Source->>Connector: Raw Data
-       Connector->>Kafka: Structured Events
-       Kafka->>Flink: Stream Processing
-       Flink->>Storage: Processed Data
-   ```
+1. **Client Layer**
+   - Web UI: Modern React-based interface
+   - CLI Tool: Command-line interface for automation
+   - REST API: RESTful endpoints for external integration
 
-2. **Query Flow**
-   ```mermaid
-   sequenceDiagram
-       participant Client
-       participant Gateway
-       participant Cache
-       participant Service
-       participant Storage
-       
-       Client->>Gateway: Request
-       Gateway->>Cache: Check Cache
-       Cache-->>Gateway: Cache Miss
-       Gateway->>Service: Process Request
-       Service->>Storage: Query Data
-       Storage-->>Service: Data
-       Service-->>Gateway: Response
-       Gateway-->>Client: Final Response
-   ```
+2. **API Gateway Layer**
+   - API Gateway: Request routing and composition
+   - Authentication & Authorization: OAuth2/OIDC-based security
 
-### Component Details
-
-1. **Core Services**
-   - Metadata Service: Asset management, versioning
-   - Validation Service: Data quality, schema validation
+3. **Core Services**
+   - Metadata Service: Central metadata management
    - Lineage Service: Data lineage tracking
-   - Search Service: Full-text and vector search
-   - Analytics Service: Real-time metrics and analytics
+   - Indexing Service: Search and discovery
+   - Query Service: Advanced query processing
+   - Analytics Service: Metadata analytics
 
-2. **Integration Layer**
-   - Event-driven architecture
-   - Real-time streaming with Kafka
-   - Batch processing with Spark
-   - Workflow orchestration with Airflow
+4. **Data Processing Layer**
+   - Stream Processing: Real-time metadata updates
+   - Batch Processing: Large-scale analytics
+   - ETL Pipeline: Data integration
 
-3. **Storage Strategy**
-   - PostgreSQL + pgvector: Structured data and vector embeddings
-   - DynamoDB: High-throughput metadata
-   - S3: Data lake storage
-   - Elasticsearch: Full-text search
-   - ClickHouse: Real-time analytics
-   - Redis: Caching layer
+5. **Storage Layer**
+   - Relational DB: Structured metadata
+   - Graph DB: Relationships and lineage
+   - Vector DB: Similarity search
+   - Time Series DB: Historical tracking
+   - Cache: Performance optimization
 
-### Security Architecture
+6. **Infrastructure Services**
+   - Service Discovery: Dynamic service registration
+   - Config Management: Centralized configuration
+   - Monitoring: Health and metrics
+   - Logging: Centralized logging
 
-```mermaid
-graph TB
-    subgraph "Security Layers"
-        subgraph "Network Security"
-            VPC["Virtual Private Cloud"]
-            WAF["Web Application Firewall"]
-            SG["Security Groups"]
-        end
-        
-        subgraph "Identity & Access"
-            SSO["Single Sign-On"]
-            IAM["Identity and Access Management"]
-            RBAC["Role-Based Access Control"]
-        end
-        
-        subgraph "Data Security"
-            ENC["Encryption"]
-            MASK["Data Masking"]
-            AUDIT["Audit Logging"]
-        end
-    end
-```
+### Design Principles
 
-### Deployment Architecture
-
-```mermaid
-graph TB
-    subgraph "CI/CD Pipeline"
-        GH["GitHub"]
-        ACT["GitHub Actions"]
-        ARGO["ArgoCD"]
-        
-        GH --> ACT
-        ACT --> ARGO
-    end
-    
-    subgraph "Infrastructure"
-        K8S["Kubernetes"]
-        RDS["Relational Database Service"]
-        CACHE["Redis"]
-        
-        ARGO --> K8S
-        K8S --> RDS
-        K8S --> CACHE
-    end
-```
+1. **Modularity**: Each component is independently deployable
+2. **Scalability**: Horizontal scaling of services
+3. **Resilience**: Fault tolerance and self-healing
+4. **Security**: Zero-trust architecture
+5. **Extensibility**: Plugin-based architecture
 
 ## Component Design
 
-### Core Components
+### Core Services
 
 1. **Metadata Service**
-   - Asset registration and discovery
-   - Relationship mapping and lineage tracking
-   - Version control and history
-   - Custom metadata attributes
-   - Bulk operations support
+   - Asset registration and lifecycle management
+   - Schema validation and evolution
+   - Custom attributes and extensions
+   - Bulk operations with transactional support
+   - Version control with Git-like branching
 
-2. **Validation Service**
-   - Data quality checks
-   - Schema validation
-   - Data normalization
+2. **Lineage Service**
+   - DAG-based lineage tracking
+   - Impact analysis and root cause detection
+   - Automated lineage inference
+   - Custom lineage rules engine
+   - Provenance tracking
 
-3. **Lineage Service**
-   - Data lineage tracking
-   - Data provenance
-   - Data dependency analysis
+3. **Search Service**
+   - Multi-modal search (text, vector, graph)
+   - Query federation across stores
+   - Real-time indexing pipeline
+   - Custom ranking algorithms
+   - Advanced query optimization
 
-4. **Search Service**
-   - Full-text search
-   - Faceted search
-   - Natural language queries
-   - Advanced filtering
-   - Semantic search capabilities
+4. **Analytics Service**
+   - Real-time metrics computation
+   - Custom aggregation pipelines
+   - Time-series analysis
+   - Anomaly detection
+   - Trend analysis
 
-5. **Analytics Service**
-   - Real-time metrics and analytics
-   - Data aggregation and grouping
-   - Data filtering and sorting
+### Data Processing
 
-### Integration Components
+1. **Stream Processing**
+   - Technology: Kafka (3.x) + Flink (1.17)
+   - Use Cases:
+     * Real-time metadata updates
+     * Incremental indexing
+     * Event processing
+     * Notification delivery
 
-1. **Connector Service**
-   - Event-driven architecture
-   - Real-time streaming with Kafka
-   - Batch processing with Spark
-   - Workflow orchestration with Airflow
+2. **Batch Processing**
+   - Technology: Spark (3.x)
+   - Use Cases:
+     * Large-scale analytics
+     * Bulk data processing
+     * Historical analysis
+     * Data quality checks
 
-2. **Event Service**
-   - Event handling and processing
-   - Event routing and filtering
-   - Event storage and retrieval
+3. **Workflow Orchestration**
+   - Technology: Airflow (2.x)
+   - Use Cases:
+     * ETL pipeline management
+     * Job scheduling
+     * Dependency management
+     * Error handling
 
-3. **Notification Service**
-   - Notification handling and processing
-   - Notification routing and filtering
-   - Notification storage and retrieval
+### Storage Strategy
+
+1. **Primary Store**
+   - Technology: PostgreSQL 15 + pgvector
+   - Purpose: Core metadata storage
+   - Features:
+     * ACID compliance
+     * Vector similarity search
+     * JSON/JSONB support
+     * Row-level security
+
+2. **Graph Store**
+   - Technology: Neo4j 5.x
+   - Purpose: Relationship management
+   - Features:
+     * Native graph processing
+     * Cypher query language
+     * Graph algorithms
+     * Visualization support
+
+3. **Time Series Store**
+   - Technology: InfluxDB 3.x
+   - Purpose: Temporal data
+   - Features:
+     * Time-based partitioning
+     * Retention policies
+     * Continuous queries
+     * Downsampling
+
+4. **Cache Layer**
+   - Technology: Redis 7.x
+   - Purpose: Performance optimization
+   - Features:
+     * Multi-level caching
+     * Cache invalidation
+     * Pub/sub messaging
+     * Rate limiting
+
+### Security Architecture
+
+1. **Authentication**
+   - OAuth2/OIDC integration
+   - MFA support
+   - SSO capabilities
+   - Token management
+
+2. **Authorization**
+   - RBAC/ABAC unified model
+   - Dynamic policy evaluation
+   - Resource-level permissions
+   - Tenant isolation
+
+3. **Audit**
+   - Comprehensive audit logging
+   - Tamper-evident logs
+   - Compliance reporting
+   - Retention policies
+
+### Monitoring & Observability
+
+1. **Metrics**
+   - RED metrics (Rate, Errors, Duration)
+   - Custom business metrics
+   - SLO/SLA tracking
+   - Capacity planning
+
+2. **Logging**
+   - Structured logging
+   - Log aggregation
+   - Log analysis
+   - Alert correlation
+
+3. **Tracing**
+   - Distributed tracing
+   - Performance profiling
+   - Bottleneck analysis
+   - Error tracking
 
 ## Data Model
 
