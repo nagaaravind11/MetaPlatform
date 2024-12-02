@@ -83,6 +83,98 @@ The MetaPlatform is an enterprise-grade metadata management system designed to a
 
 The MetaPlatform architecture follows a modern, cloud-native microservices approach with emphasis on scalability, resilience, and extensibility.
 
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        UI[Web UI]
+        CLI[CLI Tool]
+        API[REST API]
+        style UI fill:#b3e0ff,stroke:#0066cc
+        style CLI fill:#b3e0ff,stroke:#0066cc
+        style API fill:#b3e0ff,stroke:#0066cc
+    end
+
+    subgraph "API Gateway Layer"
+        Gateway[API Gateway]
+        Auth[Authentication & Authorization]
+        style Gateway fill:#ffcccc,stroke:#ff0000
+        style Auth fill:#ffcccc,stroke:#ff0000
+    end
+
+    subgraph "Core Services"
+        direction TB
+        MS[Metadata Service]
+        LS[Lineage Service]
+        IS[Indexing Service]
+        QS[Query Service]
+        AS[Analytics Service]
+        style MS fill:#d9f2d9,stroke:#006600
+        style LS fill:#d9f2d9,stroke:#006600
+        style IS fill:#d9f2d9,stroke:#006600
+        style QS fill:#d9f2d9,stroke:#006600
+        style AS fill:#d9f2d9,stroke:#006600
+    end
+
+    subgraph "Data Processing Layer"
+        Stream[Stream Processing]
+        Batch[Batch Processing]
+        ETL[ETL Pipeline]
+        style Stream fill:#ffe6cc,stroke:#ff9900
+        style Batch fill:#ffe6cc,stroke:#ff9900
+        style ETL fill:#ffe6cc,stroke:#ff9900
+    end
+
+    subgraph "Storage Layer"
+        RDB[(Relational DB)]
+        Graph[(Graph DB)]
+        Vector[(Vector DB)]
+        TS[(Time Series DB)]
+        Cache[(Cache)]
+        style RDB fill:#e6ccff,stroke:#6600cc
+        style Graph fill:#e6ccff,stroke:#6600cc
+        style Vector fill:#e6ccff,stroke:#6600cc
+        style TS fill:#e6ccff,stroke:#6600cc
+        style Cache fill:#e6ccff,stroke:#6600cc
+    end
+
+    subgraph "Infrastructure Services"
+        Service-Discovery[Service Discovery]
+        Config[Config Management]
+        Monitoring[Monitoring]
+        Logging[Logging]
+        style Service-Discovery fill:#ffd9cc,stroke:#cc3300
+        style Config fill:#ffd9cc,stroke:#cc3300
+        style Monitoring fill:#ffd9cc,stroke:#cc3300
+        style Logging fill:#ffd9cc,stroke:#cc3300
+    end
+
+    %% Connections
+    UI --> Gateway
+    CLI --> Gateway
+    API --> Gateway
+    Gateway --> Auth
+    Auth --> MS & LS & IS & QS & AS
+    
+    MS --> Stream & Batch
+    LS --> Stream & Batch
+    IS --> Stream
+    QS --> Cache
+    AS --> Batch
+    
+    Stream --> RDB & Graph & Vector & TS
+    Batch --> RDB & Graph & Vector & TS
+    ETL --> RDB & Graph & Vector & TS
+    
+    MS & LS & IS & QS & AS --> Service-Discovery
+    MS & LS & IS & QS & AS --> Config
+    MS & LS & IS & QS & AS --> Monitoring
+    MS & LS & IS & QS & AS --> Logging
+
+    classDef default fill:#fff,stroke:#333,stroke-width:2px;
+```
+
+
 ### Core Components
 
 1. **Client Layer**
@@ -262,6 +354,119 @@ The MetaPlatform architecture follows a modern, cloud-native microservices appro
 
 ## Data Model
 
+```mermaid
+erDiagram
+    %% Core Entities
+    Asset {
+        string id PK "UUID"
+        string name "required"
+        string description "optional"
+        string type_id FK "required"
+        json metadata "extensible"
+        timestamp created_at
+        timestamp updated_at
+        string created_by FK
+        string updated_by FK
+        string workspace_id FK
+        string version "semantic"
+        bool is_deleted
+    }
+
+    AssetType {
+        string id PK "UUID"
+        string name "required"
+        string category "enum"
+        json schema "JSON Schema"
+        timestamp created_at
+        bool is_system
+    }
+
+    Workspace {
+        string id PK "UUID"
+        string name "required"
+        string description
+        timestamp created_at
+        string owner_id FK
+        json settings
+        bool is_active
+    }
+
+    %% Relationship Entities
+    Lineage {
+        string id PK "UUID"
+        string source_id FK "required"
+        string target_id FK "required"
+        string type "enum"
+        json metadata
+        timestamp created_at
+        string workspace_id FK
+    }
+
+    Tag {
+        string id PK "UUID"
+        string name "required"
+        string category
+        json attributes
+        timestamp created_at
+        string workspace_id FK
+    }
+
+    %% Security Entities
+    User {
+        string id PK "UUID"
+        string email "unique"
+        string name
+        timestamp created_at
+        bool is_active
+        json preferences
+    }
+
+    Team {
+        string id PK "UUID"
+        string name "required"
+        string description
+        timestamp created_at
+        string workspace_id FK
+    }
+
+    Role {
+        string id PK "UUID"
+        string name "required"
+        json permissions "RBAC"
+        bool is_system
+        string workspace_id FK
+    }
+
+    %% Audit Entities
+    AuditLog {
+        string id PK "UUID"
+        string entity_id FK
+        string entity_type
+        string action
+        json changes
+        timestamp created_at
+        string user_id FK
+        string workspace_id FK
+    }
+
+    %% Relationships with corrected cardinality
+    Asset ||--|| AssetType : "is of type"
+    Asset ||--o{ Tag : "has many"
+    Asset ||--o{ Lineage : "is source of"
+    Asset ||--o{ Lineage : "is target of"
+    Asset }|--|| Workspace : "belongs to"
+    
+    Workspace ||--o{ Team : "contains"
+    Workspace ||--o{ Role : "defines"
+    Workspace ||--|| User : "owned by"
+    
+    Team ||--o{ User : "has members"
+    Team ||--o{ Role : "has roles"
+    
+    User ||--o{ AuditLog : "performs"
+```
+
+
 ### Core Entities
 
 1. **Asset**
@@ -320,6 +525,29 @@ The MetaPlatform architecture follows a modern, cloud-native microservices appro
    - Tamper-evident logs
    - Compliance reporting
    - Retention policies
+     
+### Key Design Decisions
+
+1. **Multi-tenancy**
+   - Workspace-based isolation
+   - Hierarchical resource organization
+   - Cross-workspace references supported
+
+2. **Extensibility**
+   - JSON metadata fields for flexibility
+   - Custom attributes via schema
+   - Pluggable type system
+
+3. **Versioning**
+   - Semantic versioning for assets
+   - Full audit history
+   - Soft deletion support
+
+4. **Security**
+   - Fine-grained RBAC
+   - Team-based access control
+   - Audit logging for compliance
+
 
 ## API Design
 
