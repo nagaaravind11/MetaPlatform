@@ -1181,6 +1181,7 @@ Connect with your existing tools:
 ### Books
 - "Fundamentals of Metadata Management"
 By Ole Olesen-Bagneux [O'Reilly](https://learning.oreilly.com/library/view/fundamentals-of-metadata/9781098162818/)
+- "System Design on AWS" By Jayanth Kumar, Mandeep Singh [O'Reilly](https://learning.oreilly.com/library/view/system-design-on/9781098146887/)
 - "Fundamentals of Data Engineering" by Joe Reis and Matt Housley [O'Reilly](https://www.oreilly.com/library/view/fundamentals-of-data/9781098108298/)
 - "Data Mesh: Delivering Data-Driven Value at Scale" by Zhamak Dehghani [O'Reilly](https://www.oreilly.com/library/view/data-mesh/9781492092384/)
 - "Designing Data-Intensive Applications" by Martin Kleppmann [O'Reilly](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/)
