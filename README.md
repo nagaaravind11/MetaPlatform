@@ -8,12 +8,12 @@
 4. [Component Design](#component-design)
 5. [Data Model](#data-model)
 6. [API Design](#api-design)
-7. [Technology Stack](#technology-stack)
-8. [Security & Compliance](#security--compliance)
-9. [Deployment Strategy](#deployment-strategy)
-10. [Scalability & Performance](#scalability--performance)
-11. [Cost Optimization](#cost-optimization)
-12. [Monitoring & Observability](#monitoring--observability)
+7. [Security & Compliance](#security--compliance)
+8. [Deployment Strategy](#deployment-strategy)
+9. [Scalability & Performance](#scalability--performance)
+10. [Cost Optimization](#cost-optimization)
+11. [Monitoring & Observability](#monitoring--observability)
+12. [Technology Stack](#technology-stack)
 13. [Key Architectural Considerations](#key-architectural-considerations)
 14. [Existing Metadata Engines Analysis](#existing-metadata-engines-analysis)
 15. [References](#references)
@@ -765,6 +765,36 @@ components:
    - Interactive API documentation
    - Code samples and SDKs
 
+## Security & Compliance
+
+### Authentication & Authorization
+
+1. **Identity Management**
+   - OAuth 2.0 / OpenID Connect
+   - SAML 2.0
+   - JWT tokens
+   - API keys
+
+2. **Access Control**
+   - RBAC (Role-Based Access Control)
+   - ABAC (Attribute-Based Access Control)
+   - Policy enforcement points
+   - Tenant isolation
+
+### Data Security
+
+1. **Encryption**
+   - Data at rest encryption
+   - TLS 1.3 for data in transit
+   - Key management service
+   - Hardware security modules (HSM)
+
+2. **Audit & Compliance**
+   - Comprehensive audit logs
+   - GDPR compliance
+   - CCPA compliance
+   - SOC 2 compliance
+
 ## Deployment Strategy
 
 ### Deployment Models
@@ -1185,6 +1215,8 @@ By Ole Olesen-Bagneux [O'Reilly](https://learning.oreilly.com/library/view/funda
 - "Fundamentals of Data Engineering" by Joe Reis and Matt Housley [O'Reilly](https://www.oreilly.com/library/view/fundamentals-of-data/9781098108298/)
 - "Data Mesh: Delivering Data-Driven Value at Scale" by Zhamak Dehghani [O'Reilly](https://www.oreilly.com/library/view/data-mesh/9781492092384/)
 - "Designing Data-Intensive Applications" by Martin Kleppmann [O'Reilly](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/)
+- "Data Quality Fundamentals" by Barr Moses, Lior Gavish, Molly Vorwerck [O'Reilly](https://learning.oreilly.com/library/view/data-quality-fundamentals/9781098112035/)
+- "Fundamentals of Data Observability" by Andy Petrella [O'Reilly](https://learning.oreilly.com/library/view/fundamentals-of-data/9781098133283/)
 - "Building Event-Driven Microservices" by Adam Bellemare [O'Reilly](https://www.oreilly.com/library/view/building-event-driven-microservices/9781492057888/)
 - "Cloud Native Patterns" by Cornelia Davis [Manning](https://www.manning.com/books/cloud-native-patterns)
 - "Building Microservices" by Sam Newman [O'Reilly](https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/)
@@ -1199,3 +1231,4 @@ By Ole Olesen-Bagneux [O'Reilly](https://learning.oreilly.com/library/view/funda
 
 ### Tools and Resources
 - **Mermaid**: [Mermaid Documentation](https://mermaid-js.github.io/mermaid/#/) - Guide on creating diagrams with Mermaid.
+- **Uber blogs**: [QueryGPT – Natural Language to SQL Using Generative AI](https://www.uber.com/en-IN/blog/query-gpt/)
