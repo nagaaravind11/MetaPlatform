@@ -906,15 +906,15 @@ components:
 | Build Tool | Gradle 8.x | Maven | - Gradle: Flexible DSL, better performance, incremental builds<br>- Maven: Simpler structure, wider adoption |
 | **Data Layer** |
 | Primary DB | Amazon RDS (PostgreSQL 15) | Aurora PostgreSQL, CockroachDB | - RDS: Managed service, cost-effective<br>- Aurora: Better scalability but higher cost<br>- CockroachDB: Global distribution but complex ops |
-| Graph DB | Amazon Neptune | Neo4j | - Neptune: Managed service, AWS integration<br>- Neo4j: Rich feature set but higher ops overhead |
-| Time Series | Amazon Timestream | Clickhouse, Apache Druid/Pinot(OLAP) | - Timestream: Serverless, AWS integration<br>- Clickhouse: Rich query language<br>- Druid/Pinot: Better for high ingestion |
+| Graph DB | Neo4j| Neo4j | - Neptune: Managed service, AWS integration<br>- Neo4j: Rich feature set but higher ops overhead |
+| Time Series | Apache Druid/Pinot(OLAP) | Clickhouse,Amazon Timestream   | - Timestream: Serverless, AWS integration<br>- Clickhouse: Rich query language<br>- Druid/Pinot: Better for high ingestion |
 | Cache | Redis | Hazelcast, Apache Ignite | - Redis: Very mature, easy scaling<br>- Hazelcast: Better data structures<br>- Ignite: More features but complex |
 | **Message Queue** |
 | Event Bus | KAFKA | Amazon SQS, RabbitMQ | - KAFKA: High throughput, retention<br>- SQS: Simpler, serverless<br>- RabbitMQ: Better routing but scaling complexity |
 | **Search** |
-| Search Engine | Amazon OpenSearch | Elasticsearch, Solr | - OpenSearch: AWS integration, managed<br>- Elasticsearch: Rich features but license concerns<br>- Solr: Simpler but less scalable |
+| Search Engine | Elasticsearch | Amazon OpenSearch, Solr | - OpenSearch: AWS integration, managed<br>- Elasticsearch: Rich features but license concerns<br>- Solr: Simpler but less scalable |
 | **Processing** |
-| Stream Processing | Amazon Kinesis | Apache Flink, Spark Streaming | - Kinesis: Managed, easy integration<br>- Flink: More features but complex ops<br>- Spark: Better batch+stream but heavy |
+| Stream Processing | Apache Flink | Amazon Kinesis, Spark Streaming | - Kinesis: Managed, easy integration<br>- Flink: More features but complex ops<br>- Spark: Better batch+stream but heavy |
 | Batch Processing | AWS EMR (Spark) | Apache Hadoop, AWS Batch | - EMR: Managed, scalable<br>- Hadoop: More control but complex<br>- AWS Batch: Simple but limited |
 | **Infrastructure** |
 | Container Orchestration | Amazon EKS | ECS, Fargate | - EKS: Standard K8s, more control<br>- ECS: Simpler but AWS-specific<br>- Fargate: Serverless but less control |
